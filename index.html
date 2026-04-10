@@ -131,7 +131,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Helvetica Neue"
     <div class="home">
       <span class="home-badge">😤 已有 9,632 人吐槽过</span>
       <h1 class="home-title">客户离谱程度<br>鉴定</h1>
-      <p class="home-desc">先想一个让你最头疼的客户 🤔<br>然后回答 4 道题，鉴定 TA 有多离谱 👇</p>
+      <p class="home-desc">4 道题，看看你平时遇到的客户<br>到底有多离谱 👇</p>
     </div>
 
     <div class="questions" id="questions"></div>
@@ -145,29 +145,29 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Helvetica Neue"
 
 <script>
 const Qs = [
-  { q: "想到这个客户，你脑子里第一个画面是？", opts: [
-    { text: "TA在跟你讲价，讲了半小时了", s: {pixiu:3} },
-    { text: "TA笑着说\"下次一定找你\"，然后再也没来", s: {zhanan:3} },
-    { text: "TA看着你的方案皱眉，说\"差点意思\"但说不出哪不好", s: {wanmei:3} },
-    { text: "TA的微信头像——因为你发了三条消息都没回", s: {shuaishou:3} }
+  { q: "你的客户最常让你听到的一句话是？", opts: [
+    { text: "\"太贵了，别家比你便宜多了\"", s: {pixiu:3} },
+    { text: "\"下次一定找你\"（然后再也没来）", s: {zhanan:3} },
+    { text: "\"不太满意，但我也说不上来哪不好\"", s: {wanmei:3} },
+    { text: "\"你看着办就行\"（出了事再来找你）", s: {shuaishou:3} }
   ]},
-  { q: "跟这个客户合作之后，最常发生的事是？", opts: [
-    { text: "活干完了TA开始砍价，\"能不能再优惠一点\"", s: {pixiu:3} },
-    { text: "TA嘴上说支持你，但真要TA配合的时候全变卦", s: {zhanan:3} },
-    { text: "改了又改，最后TA说\"还是第一版好\"", s: {wanmei:3} },
-    { text: "TA付完钱就消失了，出问题才冒出来说\"你怎么没提醒我\"", s: {shuaishou:3} }
+  { q: "跟客户合作之后，你最常遇到的情况是？", opts: [
+    { text: "活干完了开始砍价，\"能不能再优惠一点\"", s: {pixiu:3} },
+    { text: "嘴上说得很好，真要配合的时候全变卦", s: {zhanan:3} },
+    { text: "改了又改，最后说\"还是第一版好\"", s: {wanmei:3} },
+    { text: "付完钱就消失，出问题才冒出来说\"你怎么没提醒我\"", s: {shuaishou:3} }
   ]},
-  { q: "因为这个客户，你最崩溃的一次是？", opts: [
-    { text: "TA把你的报价拿去跟别家比，回来说\"人家便宜一半\"", s: {pixiu:3} },
-    { text: "TA说\"放心不会亏待你\"，结果一分钱好处都没见到", s: {zhanan:3} },
-    { text: "TA说\"再调一下\"，你已经数不清是第几次了", s: {wanmei:3} },
-    { text: "出了问题TA甩锅给你，明明是TA自己没说清楚", s: {shuaishou:3} }
+  { q: "做生意这些年，最让你崩溃的客户是？", opts: [
+    { text: "把你报价拿去比价，回来说\"人家便宜一半\"", s: {pixiu:3} },
+    { text: "说\"放心不会亏待你\"，结果一分钱好处都没有", s: {zhanan:3} },
+    { text: "说\"再调一下\"，你已经数不清是第几次了", s: {wanmei:3} },
+    { text: "出了问题全甩给你，明明是他自己没说清楚", s: {shuaishou:3} }
   ]},
-  { q: "到了该付钱的时候，这个客户？", opts: [
-    { text: "\"再便宜点我马上转\"——TA每次都这么说", s: {pixiu:3} },
+  { q: "到了该收钱的时候，你的客户一般？", opts: [
+    { text: "\"再便宜点我马上转\"——每次都这么说", s: {pixiu:3} },
     { text: "\"钱的事好说\"——但从来没好说过", s: {zhanan:3} },
-    { text: "钱倒是会给，但验收确认能拖一个月", s: {wanmei:3} },
-    { text: "你催了三遍没回，第四遍TA说\"最近太忙了\"", s: {shuaishou:3} }
+    { text: "钱倒是会给，但确认验收能拖一个月", s: {wanmei:3} },
+    { text: "催了三遍没回，第四遍说\"最近太忙了\"", s: {shuaishou:3} }
   ]}
 ];
 
