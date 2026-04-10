@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
-<title>甲方离谱程度鉴定</title>
+<title>客户离谱程度鉴定</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 html{font-size:16px;-webkit-text-size-adjust:100%}
@@ -130,13 +130,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Helvetica Neue"
   <div id="mainPage">
     <div class="home">
       <span class="home-badge">😤 已有 9,632 人吐槽过</span>
-      <h1 class="home-title">甲方离谱程度<br>鉴定</h1>
-      <p class="home-desc">4 道题，鉴定你的甲方有多离谱<br>看看谁的甲方最难伺候 👇</p>
+      <h1 class="home-title">客户离谱程度<br>鉴定</h1>
+      <p class="home-desc">4 道题，鉴定你的客户有多难搞<br>看看谁的客户最离谱 👇</p>
     </div>
 
     <div class="questions" id="questions"></div>
     <div class="submit-wrap">
-      <button class="submit-btn" id="submitBtn">鉴定我的甲方</button>
+      <button class="submit-btn" id="submitBtn">鉴定我的客户</button>
     </div>
   </div>
 
@@ -145,92 +145,80 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Helvetica Neue"
 
 <script>
 const Qs = [
-  { q: "甲方最常说的一句话是？", opts: [
-    { text: "\"预算有限，但效果要好\"", s: {pixiu:3} },
-    { text: "\"你是专业的，你来定\"", s: {zhanan:3} },
-    { text: "\"我觉得可以再改改\"", s: {wanmei:3} },
-    { text: "\"你看着办吧\"", s: {shuaishou:3} }
+  { q: "客户最让你头疼的一句话是？", opts: [
+    { text: "\"太贵了，别家比你便宜多了\"", s: {pixiu:3} },
+    { text: "\"行行行，回头联系你\"（然后没有然后）", s: {zhanan:3} },
+    { text: "\"不太满意，但我也说不上来哪不好\"", s: {wanmei:3} },
+    { text: "\"随便，你看着安排就行\"（出事再找你）", s: {shuaishou:3} }
   ]},
-  { q: "甲方改需求的风格？", opts: [
-    { text: "不改需求，只砍预算", s: {pixiu:3} },
-    { text: "嘴上说不改，验收时突然翻脸", s: {zhanan:3} },
-    { text: "隔三差五改，每次都说\"最后一次\"", s: {wanmei:3} },
-    { text: "根本没给过明确需求，你全靠猜", s: {shuaishou:3} }
+  { q: "客户下单/签约后的表现？", opts: [
+    { text: "一直加需求但不加钱，\"顺手的事嘛\"", s: {pixiu:3} },
+    { text: "嘴上说支持你，关键时刻全变卦", s: {zhanan:3} },
+    { text: "反复改来改去，最后说\"还是第一版好\"", s: {wanmei:3} },
+    { text: "付完钱就消失，有问题才冒出来", s: {shuaishou:3} }
   ]},
-  { q: "让你最崩溃的瞬间是？", opts: [
-    { text: "活干完了，开始跟你砍价", s: {pixiu:3} },
-    { text: "方案做了三版，甲方说\"还是第一版好\"", s: {wanmei:3} },
-    { text: "\"不会亏待你\"说了三次，一次没兑现", s: {zhanan:3} },
-    { text: "出了问题才上线，还说\"不是我决定的\"", s: {shuaishou:3} }
+  { q: "和客户打交道最崩溃的瞬间？", opts: [
+    { text: "做完了开始砍价，\"能不能给个优惠\"", s: {pixiu:3} },
+    { text: "\"下次一定找你\"说了八百遍了", s: {zhanan:3} },
+    { text: "改了无数遍他还是觉得\"差点意思\"", s: {wanmei:3} },
+    { text: "出了问题怪你没提醒，明明他自己没说清", s: {shuaishou:3} }
   ]},
-  { q: "甲方付款的时候？", opts: [
-    { text: "\"能不能再便宜点，便宜了马上付\"", s: {pixiu:3} },
-    { text: "\"先做，做好了不会亏待你\"", s: {zhanan:3} },
-    { text: "钱倒是给，就是验收遥遥无期", s: {wanmei:3} },
-    { text: "催三遍已读不回，第四遍说\"在走流程\"", s: {shuaishou:3} }
+  { q: "客户付款的时候？", opts: [
+    { text: "\"再便宜一点我马上转\"（每次都这样）", s: {pixiu:3} },
+    { text: "\"放心，不会亏待你的\"（一直在亏待你）", s: {zhanan:3} },
+    { text: "钱倒是给，但验收/确认拖到天荒地老", s: {wanmei:3} },
+    { text: "催三遍不回，第四遍说\"最近太忙了\"", s: {shuaishou:3} }
   ]}
 ];
 
 const TYPES = {
-  pixiu: { name:"貔貅型甲方", code:"NO PAY", emoji:"💰", pct:41, stars:"★★★★★",
-    tagline:"只进不出，需求倒是很多",
-    summary:"你遇到了最常见也最难缠的甲方类型。他的核心逻辑是：花最少的钱办最多的事，最好不花钱。预算永远有限，需求永远无限，付款永远下个月。你在他眼里不是合作伙伴，是免费劳动力。",
-    pros:["至少需求明确——就是要便宜","不太画饼，因为连饼都舍不得","如果你真便宜又好，他会长期用你"],
-    cons:["预算谈判极度消耗精力","每次都想加需求但不加钱","拖款是常态，催款是你的日常"],
-    pitfalls:["别想着「先做便宜的，后面他会加预算」——不会的","学会在报价时就把改动次数写进合同","最根本的解法：不依赖单一甲方，自己掌握客源"],
+  pixiu: { name:"貔貅型客户", code:"NO PAY", emoji:"💰", pct:41, stars:"★★★★★",
+    tagline:"只想占便宜，需求倒是很多",
+    summary:"你遇到了最常见也最消耗的客户类型。他的核心逻辑很简单：花最少的钱，享最好的服务。还价是本能，加需求不加钱是习惯，尾款能拖就拖。你对他来说不是合作伙伴，是能压价就压价的供应商。",
     traits:[
-      {name:"抠门指数",val:95,desc:"「能不能便宜点」是口头禅，免费的最好"},
-      {name:"需求变化",val:78,desc:"每次都说「最后改一点」，你已经数不清第几次了"},
-      {name:"画饼能力",val:40,desc:"倒是不怎么画饼，因为连饼都舍不得画"},
-      {name:"拖款指数",val:92,desc:"「下个月一起结」已经说了三个月了"}
+      {name:"砍价指数",val:95,desc:"「太贵了」是开场白，「便宜点」是口头禅"},
+      {name:"纠结程度",val:45,desc:"不纠结——他很清楚自己就是要最便宜的"},
+      {name:"扯皮能力",val:78,desc:"做完了还能找理由砍尾款，「顺手的事」能加十次"},
+      {name:"付款态度",val:92,desc:"「马上转」已经说了三周了"}
     ],
-    hookTitle:"别气了，全国 41% 的乙方都遇到了同款",
-    hookText:"伺候甲方这么累，是因为主动权不在你手上。<br>与其等甲方赏饭，不如<strong>自己学会找客户</strong>。<br><strong>从伺候甲方，到自己当甲方。</strong>"
+    hookTitle:"别气了，全国 41% 的老板都遇到了同款客户",
+    hookText:"被客户压价压到没利润，是因为你的客户来源太单一。<br>当你能自己找到更多客户的时候，<strong>你才有底气拒绝不合理的价格</strong>。"
   },
-  zhanan: { name:"渣男型甲方", code:"BIG PIE", emoji:"🌹", pct:27, stars:"★★★★☆",
+  zhanan: { name:"渣男型客户", code:"BIG PIE", emoji:"🌹", pct:27, stars:"★★★★☆",
     tagline:"嘴上说的都好听，就是不落实",
-    summary:"这是杀伤力最大的甲方类型。他不会直接为难你，反而对你很「好」——夸你专业、说后面还有大单、承诺不会亏待你。但每一句好话背后都藏着一个坑。你不知不觉投入越来越多，回报却从来没兑现过。",
-    pros:["沟通体验还行，至少态度好","不会当面撕破脸，给你留面子","偶尔真的会有一些小单给你"],
-    cons:["承诺从来不兑现，「下次一定」永远没有下次","让你一直抱有希望，一直投入沉没成本","验收时突然翻脸，所有问题都是你的"],
-    pitfalls:["别被「后面还有大单」忽悠了——先把这单的钱结了再说","「你是专业的你来定」不是信任你，是在给你挖坑","最根本的解法：客户不能只靠一个甲方介绍，得自己有渠道"],
+    summary:"这是最磨人的客户类型。他不会直接为难你，反而特别「客气」——「下次一定找你」「有朋友要推荐给你」「不会亏待你的」。但你等来等去，一次都没兑现。你在他那里排不上号，但他让你以为自己排得上。",
     traits:[
-      {name:"抠门指数",val:55,desc:"不算抠，但「不会亏待你」从来没兑现过"},
-      {name:"需求变化",val:60,desc:"需求不常改，但验收时突然翻脸比翻书还快"},
-      {name:"画饼能力",val:98,desc:"全类型最强，每次都让你觉得下一单更大"},
-      {name:"拖款指数",val:70,desc:"不直接拖，但总有理由延期，温水煮青蛙"}
+      {name:"砍价指数",val:50,desc:"不算太抠，但承诺的事从来不兑现"},
+      {name:"纠结程度",val:60,desc:"其实不纠结，他早就决定了——只是不告诉你"},
+      {name:"扯皮能力",val:55,desc:"不正面扯皮，但冷处理你比翻脸还难受"},
+      {name:"付款态度",val:70,desc:"不直接赖账，但总有理由延期"}
     ],
-    hookTitle:"渣男型甲方最大的杀伤力",
-    hookText:"让你一直抱有希望，一直投入，但永远得不到对等的回报。<br>做生意也一样——<strong>与其依赖不靠谱的甲方，不如自己掌握客源。</strong>"
+    hookTitle:"渣男型客户最大的杀伤力",
+    hookText:"让你一直抱有希望，一直等，但永远等不到。<br>做生意最怕的不是被拒绝，是<strong>被吊着</strong>。<br><strong>自己能找到新客户，你就不用等任何人。</strong>"
   },
-  wanmei: { name:"完美型甲方", code:"AGAIN", emoji:"🔍", pct:19, stars:"★★★★☆",
+  wanmei: { name:"纠结型客户", code:"AGAIN", emoji:"🔍", pct:19, stars:"★★★★☆",
     tagline:"永远差一点，但说不出差在哪",
-    summary:"这种甲方不坏，但极度消耗。他自己也不知道要什么，但知道你做的「不太对」。你改了八版他还是觉得「差点感觉」，但你问他差哪里他又说不上来。你的时间和耐心就这样被无限稀释。",
-    pros:["至少不是故意为难你，确实是选择困难","对质量有追求，做出来的东西不会太差","钱倒是给——只是验收遥遥无期"],
-    cons:["无限修改消耗你大量时间和精力","他的「差点感觉」你永远猜不透","做到最后你比他还不知道要什么了"],
-    pitfalls:["别以为改到最后他会满意——不会的，学会在第三版时锁定方向","合同里写清楚修改次数和额外收费标准","最根本的解法：与其耗在一个项目上，不如自己找更多客户分散风险"],
+    summary:"这种客户不坏心，但极度消耗你。他自己也不知道要什么，但知道你给的「不太对」。改了八遍他还是觉得「差点感觉」，问他差哪里又说不上来。你的时间和耐心就这样被一点点磨没了。",
     traits:[
-      {name:"抠门指数",val:45,desc:"钱倒是给，但你的时间被无限消耗也是一种剥削"},
-      {name:"需求变化",val:97,desc:"全类型最强——改到第 8 版你已经忘了第 1 版什么样"},
-      {name:"画饼能力",val:65,desc:"「做好这个后面还有大单」——你信吗？"},
-      {name:"拖款指数",val:35,desc:"付款倒是还行，就是验收遥遥无期"}
+      {name:"砍价指数",val:40,desc:"钱倒是给，但你的时间被无限消耗也是一种剥削"},
+      {name:"纠结程度",val:97,desc:"全类型最强——改到第 8 版你已经忘了第 1 版什么样"},
+      {name:"扯皮能力",val:65,desc:"不算故意扯皮，但他的「再想想」能拖死你"},
+      {name:"付款态度",val:35,desc:"付款还行，就是确认/验收遥遥无期"}
     ],
-    hookTitle:"完美型甲方消耗的不是你的能力",
-    hookText:"是你的耐心和时间。你的精力全耗在无尽的修改里了。<br>如果客户是自己找来的，<strong>你就是甲方，你说了算。</strong>"
+    hookTitle:"纠结型客户消耗的不是你的能力",
+    hookText:"是你的时间和耐心。你的精力全耗在一个客户的反复修改里了。<br><strong>当你有更多客户来源，你就不用把所有精力押在一个人身上。</strong>"
   },
-  shuaishou: { name:"甩手型甲方", code:"NOT ME", emoji:"🫥", pct:13, stars:"★★★★★",
-    tagline:"啥都不管，出事全找你",
-    summary:"这是最危险的甲方类型。平时你完全找不到他，需要确认的事已读不回，需要拍板的事「你看着办」。但一旦出了问题，他瞬间上线，而且所有责任都是你的——因为「是你决定的」。你不是他的乙方，你是他的背锅侠。",
-    pros:["自由度高——反正他也不管","不用应付频繁的沟通和汇报","如果一切顺利，他会觉得你很能干"],
-    cons:["没有明确需求，你只能靠猜","出了问题全是你的锅，没有人帮你扛","拖款是标配，因为他连审批都懒得发起"],
-    pitfalls:["每次沟通都留文字记录，关键决策让他书面确认","「你看着办」不是信任，是在给自己留后路","最根本的解法：不要把全部精力押在一个甩手甲方身上，自己建立客户渠道"],
+  shuaishou: { name:"甩手型客户", code:"NOT ME", emoji:"🫥", pct:13, stars:"★★★★★",
+    tagline:"啥都不说清楚，出事全怪你",
+    summary:"这是最危险的客户类型。下单的时候「你看着办」「我信任你」，但一旦结果不满意，立刻翻脸——「又不是我让你这么做的」。你不是他的合作伙伴，你是他的背锅侠。平时找不到人，出事秒出现。",
     traits:[
-      {name:"抠门指数",val:85,desc:"花最少的钱想要最好的效果，且理所当然"},
-      {name:"需求变化",val:30,desc:"需求不变——因为他根本没给过明确需求"},
-      {name:"画饼能力",val:50,desc:"不画饼也不给方向，你全靠猜"},
-      {name:"拖款指数",val:90,desc:"催三遍已读不回，第四遍说「在走流程」"}
+      {name:"砍价指数",val:85,desc:"花最少的钱，但要求最高的结果"},
+      {name:"纠结程度",val:25,desc:"不纠结——因为他根本没想过需求是什么"},
+      {name:"扯皮能力",val:90,desc:"全类型最强，出了问题永远不是他的责任"},
+      {name:"付款态度",val:88,desc:"催三遍不回，第四遍说「最近太忙了」"}
     ],
-    hookTitle:"甩手型甲方是最危险的一种",
-    hookText:"因为你永远不知道他什么时候炸。<br>做生意最怕的不是忙，是<strong>被动</strong>。<br><strong>自己掌握客源，才能选择和谁合作。</strong>"
+    hookTitle:"甩手型客户是最危险的一种",
+    hookText:"因为你永远不知道他什么时候翻脸。<br>做生意最怕的不是忙，是<strong>被动</strong>。<br><strong>自己掌握客源，才能选择跟谁合作、不跟谁合作。</strong>"
   }
 };
 
@@ -306,7 +294,7 @@ function showResult(typeKey) {
       <div class="res-type">${t.name}</div>
       <div class="res-tagline">"${t.tagline}"</div>
       <div class="res-stats">
-        <div><div class="res-stat-val">${t.pct}%</div><div class="res-stat-label">遇到同款甲方</div></div>
+        <div><div class="res-stat-val">${t.pct}%</div><div class="res-stat-label">遇到同款客户</div></div>
         <div><div class="res-stat-val">${t.stars}</div><div class="res-stat-label">离谱指数</div></div>
       </div>
     </div>
@@ -315,7 +303,7 @@ function showResult(typeKey) {
       <div class="res-summary-text">${t.summary}</div>
     </div>
     <div class="res-traits">
-      <div class="res-traits-title">📊 甲方画像</div>
+      <div class="res-traits-title">📊 客户画像</div>
       ${traitRows}
     </div>
     <div class="res-hook">
@@ -324,8 +312,8 @@ function showResult(typeKey) {
     </div>
     <div class="res-cta">
       <div class="res-cta-badge">🏢 官方中小商家扶持活动 · 限时免费</div>
-      <div class="res-cta-title">不伺候甲方了，自己找客户</div>
-      <div class="res-cta-sub">免费领取一份专属获客方案</div>
+      <div class="res-cta-title">别让难搞的客户拖垮你</div>
+      <div class="res-cta-sub">免费领取一份专属获客方案，自己掌握主动权</div>
       <div class="res-cta-list">
         <div class="res-cta-item">你所在行业的同行获客案例</div>
         <div class="res-cta-item">2026 行业获客趋势与打法</div>
@@ -335,7 +323,7 @@ function showResult(typeKey) {
       <div class="res-cta-qr">二维码</div>
       <div class="res-cta-trust">✅ 全程免费 · ✅ 不推销 · ✅ 随时可删</div>
     </div>
-    <div class="res-share"><span class="res-share-btn">😤 让朋友也来鉴定他的甲方</span></div>
+    <div class="res-share"><span class="res-share-btn">😤 让朋友也来鉴定他的客户</span></div>
     <div class="res-foot">已有 9,632 人吐槽过</div>
   `;
 
