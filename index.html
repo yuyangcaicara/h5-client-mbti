@@ -278,7 +278,10 @@ document.getElementById('submitBtn').addEventListener('click', function() {
     const s = Qs[qi].opts[oi].s;
     for (const k in s) scores[k] += s[k];
   });
-  const winner = Object.keys(scores).sort((a,b) => scores[b]-scores[a])[0];
+  // 找最高分，同分随机选
+  const maxScore = Math.max(...Object.values(scores));
+  const tied = Object.keys(scores).filter(k => scores[k] === maxScore);
+  const winner = tied[Math.floor(Math.random() * tied.length)];
   showResult(winner);
 });
 
