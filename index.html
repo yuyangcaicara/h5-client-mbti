@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>甲方离谱程度鉴定</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html{font-size:16px;-webkit-text-size-adjust:100%}
+body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Helvetica Neue",sans-serif;
+  background:#0a0a0f;color:#fff;-webkit-font-smoothing:antialiased}
+#app{max-width:420px;margin:0 auto;min-height:100vh}
+
+/* 首页 */
+.home{padding:48px 24px 40px;text-align:center;
+  background:linear-gradient(180deg,#0a0a0f 0%,#1a0a1e 100%)}
+.home-badge{display:inline-block;font-size:11px;color:#e879f9;font-weight:600;
+  background:rgba(232,121,249,.12);padding:4px 14px;border-radius:20px;margin-bottom:20px;
+  border:1px solid rgba(232,121,249,.2)}
+.home-title{font-size:28px;font-weight:800;line-height:1.4;margin-bottom:10px;
+  background:linear-gradient(135deg,#fff,#e879f9);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.home-desc{font-size:14px;color:#888;line-height:1.8;margin-bottom:24px}
+
+/* 题目区 */
+.questions{padding:0 20px 20px}
+.q-block{margin-bottom:18px}
+.q-label{font-size:14px;font-weight:700;color:#eee;margin-bottom:10px;line-height:1.5}
+.q-num{color:#e879f9;margin-right:4px}
+.q-opts{display:flex;flex-direction:column;gap:8px}
+.q-opt{padding:14px 16px;border-radius:12px;background:rgba(255,255,255,.05);
+  border:1.5px solid rgba(255,255,255,.08);font-size:13px;color:#bbb;line-height:1.4;
+  cursor:pointer;transition:all .2s;-webkit-tap-highlight-color:transparent}
+.q-opt:active{transform:scale(.98)}
+.q-opt.selected{border-color:#e879f9;background:rgba(232,121,249,.1);color:#e879f9}
+
+/* 提交 */
+.submit-wrap{padding:0 20px 32px}
+.submit-btn{display:block;width:100%;padding:16px;border-radius:50px;font-size:16px;
+  font-weight:700;border:0;cursor:pointer;-webkit-tap-highlight-color:transparent;
+  transition:all .3s;background:#333;color:#666;pointer-events:none}
+.submit-btn.active{background:linear-gradient(135deg,#e879f9,#a855f7);color:#0f0f14;
+  pointer-events:auto;box-shadow:0 4px 20px rgba(232,121,249,.3)}
+.submit-btn.active:active{transform:scale(.97)}
+
+/* 结果页 */
+.result{display:none;padding:32px 20px 40px;
+  background:linear-gradient(180deg,#0a0a0f 0%,#1a0a1e 50%,#0f0f14 100%);
+  animation:fadeUp .5s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+
+.res-header{text-align:center;margin-bottom:24px}
+.res-emoji{font-size:48px;margin-bottom:6px}
+.res-code{font-size:32px;font-weight:900;color:#e879f9;letter-spacing:5px;margin-bottom:6px;
+  text-shadow:0 0 30px rgba(232,121,249,.3)}
+.res-type{font-size:16px;font-weight:600;color:#ccc;margin-bottom:8px}
+.res-tagline{font-size:13px;color:#888;font-style:italic;margin-bottom:16px}
+.res-stats{display:flex;justify-content:center;gap:24px}
+.res-stat-val{font-size:18px;font-weight:700;color:#e879f9}
+.res-stat-label{font-size:11px;color:#666;margin-top:2px}
+
+/* 综述 */
+.res-summary{padding:18px;border-radius:16px;background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.08);margin-bottom:16px}
+.res-summary-title{font-size:14px;font-weight:700;color:#e879f9;margin-bottom:10px}
+.res-summary-text{font-size:13px;color:#bbb;line-height:1.8}
+
+/* 优劣势 */
+.res-pros-cons{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.res-pc-card{padding:14px;border-radius:14px}
+.res-pc-card.pros{background:rgba(34,197,94,.06);border:1px solid rgba(34,197,94,.12)}
+.res-pc-card.cons{background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.12)}
+.res-pc-title{font-size:12px;font-weight:700;margin-bottom:8px}
+.res-pc-card.pros .res-pc-title{color:#22c55e}
+.res-pc-card.cons .res-pc-title{color:#ef4444}
+.res-pc-item{font-size:11px;color:#999;line-height:1.8;padding-left:14px;position:relative}
+.res-pc-card.pros .res-pc-item::before{content:'✓';position:absolute;left:0;color:#22c55e;font-weight:700}
+.res-pc-card.cons .res-pc-item::before{content:'✗';position:absolute;left:0;color:#ef4444;font-weight:700}
+
+/* 误区 */
+.res-pitfall{padding:16px 18px;border-radius:14px;background:rgba(232,121,249,.06);
+  border:1px solid rgba(232,121,249,.12);margin-bottom:16px}
+.res-pitfall-title{font-size:13px;font-weight:700;color:#e879f9;margin-bottom:8px}
+.res-pitfall-item{font-size:12px;color:#aaa;line-height:1.8;padding-left:18px;position:relative}
+.res-pitfall-item::before{content:'⚠';position:absolute;left:0}
+
+/* 特征分析 */
+.res-traits{padding:20px;border-radius:16px;background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.08);margin-bottom:16px}
+.res-traits-title{font-size:14px;font-weight:700;color:#e879f9;margin-bottom:14px}
+.trait{margin-bottom:14px}.trait:last-child{margin-bottom:0}
+.trait-top{display:flex;justify-content:space-between;margin-bottom:5px}
+.trait-name{font-size:12px;color:#ccc;font-weight:600}
+.trait-val{font-size:11px;color:#e879f9;font-weight:700}
+.trait-bar{height:6px;background:rgba(255,255,255,.08);border-radius:3px;overflow:hidden}
+.trait-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,#e879f9,#a855f7);transition:width 1s ease}
+.trait-desc{font-size:11px;color:#777;margin-top:4px;line-height:1.5}
+
+/* 钩子 */
+.res-hook{padding:18px;border-radius:14px;
+  background:linear-gradient(135deg,rgba(232,121,249,.08),rgba(168,85,247,.04));
+  border:1px solid rgba(232,121,249,.15);margin-bottom:16px;text-align:center}
+.res-hook-title{font-size:14px;font-weight:700;color:#e879f9;margin-bottom:8px}
+.res-hook-text{font-size:13px;color:#aaa;line-height:1.7}
+.res-hook-text strong{color:#fff}
+
+/* CTA */
+.res-cta{padding:22px 18px;border-radius:18px;background:#e879f9;text-align:center;margin-bottom:16px}
+.res-cta-badge{display:inline-block;font-size:10px;font-weight:700;color:#fff;
+  background:#ef4444;padding:3px 10px;border-radius:10px;margin-bottom:10px}
+.res-cta-title{font-size:17px;font-weight:800;color:#0f0f14;margin-bottom:4px}
+.res-cta-sub{font-size:12px;color:rgba(15,15,20,.5);margin-bottom:14px}
+.res-cta-list{text-align:left;margin:0 auto 14px;max-width:260px}
+.res-cta-item{font-size:12px;color:rgba(15,15,20,.7);line-height:2;padding-left:18px;position:relative}
+.res-cta-item::before{content:'✓';position:absolute;left:0;color:#0f0f14;font-weight:700}
+.res-cta-qr{width:100px;height:100px;background:#fff;border-radius:12px;margin:0 auto 10px;
+  display:flex;align-items:center;justify-content:center;font-size:11px;color:#999}
+.res-cta-trust{font-size:11px;color:rgba(15,15,20,.45)}
+
+.res-share{text-align:center;padding:14px 0}
+.res-share-btn{display:inline-block;padding:12px 32px;border-radius:50px;font-size:13px;
+  font-weight:600;color:#e879f9;background:rgba(232,121,249,.1);border:1px solid rgba(232,121,249,.2);
+  cursor:pointer}
+.res-share-btn:active{transform:scale(.96)}
+.res-foot{text-align:center;font-size:12px;color:#555;padding-bottom:20px}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <div id="mainPage">
+    <div class="home">
+      <span class="home-badge">😤 已有 9,632 人吐槽过</span>
+      <h1 class="home-title">甲方离谱程度<br>鉴定</h1>
+      <p class="home-desc">4 道题，鉴定你的甲方有多离谱<br>看看谁的甲方最难伺候 👇</p>
+    </div>
+
+    <div class="questions" id="questions"></div>
+    <div class="submit-wrap">
+      <button class="submit-btn" id="submitBtn">鉴定我的甲方</button>
+    </div>
+  </div>
+
+  <div class="result" id="result"></div>
+</div>
+
+<script>
+const Qs = [
+  { q: "甲方最常说的一句话是？", opts: [
+    { text: "\"预算有限，但效果要好\"", s: {pixiu:3} },
+    { text: "\"你是专业的，你来定\"", s: {zhanan:3} },
+    { text: "\"我觉得可以再改改\"", s: {wanmei:3} },
+    { text: "\"你看着办吧\"", s: {shuaishou:3} }
+  ]},
+  { q: "甲方改需求的风格？", opts: [
+    { text: "不改需求，只砍预算", s: {pixiu:3} },
+    { text: "嘴上说不改，验收时突然翻脸", s: {zhanan:3} },
+    { text: "隔三差五改，每次都说\"最后一次\"", s: {wanmei:3} },
+    { text: "根本没给过明确需求，你全靠猜", s: {shuaishou:3} }
+  ]},
+  { q: "让你最崩溃的瞬间是？", opts: [
+    { text: "活干完了，开始跟你砍价", s: {pixiu:3} },
+    { text: "方案做了三版，甲方说\"还是第一版好\"", s: {wanmei:3} },
+    { text: "\"不会亏待你\"说了三次，一次没兑现", s: {zhanan:3} },
+    { text: "出了问题才上线，还说\"不是我决定的\"", s: {shuaishou:3} }
+  ]},
+  { q: "甲方付款的时候？", opts: [
+    { text: "\"能不能再便宜点，便宜了马上付\"", s: {pixiu:3} },
+    { text: "\"先做，做好了不会亏待你\"", s: {zhanan:3} },
+    { text: "钱倒是给，就是验收遥遥无期", s: {wanmei:3} },
+    { text: "催三遍已读不回，第四遍说\"在走流程\"", s: {shuaishou:3} }
+  ]}
+];
+
+const TYPES = {
+  pixiu: { name:"貔貅型甲方", code:"NO PAY", emoji:"💰", pct:41, stars:"★★★★★",
+    tagline:"只进不出，需求倒是很多",
+    summary:"你遇到了最常见也最难缠的甲方类型。他的核心逻辑是：花最少的钱办最多的事，最好不花钱。预算永远有限，需求永远无限，付款永远下个月。你在他眼里不是合作伙伴，是免费劳动力。",
+    pros:["至少需求明确——就是要便宜","不太画饼，因为连饼都舍不得","如果你真便宜又好，他会长期用你"],
+    cons:["预算谈判极度消耗精力","每次都想加需求但不加钱","拖款是常态，催款是你的日常"],
+    pitfalls:["别想着「先做便宜的，后面他会加预算」——不会的","学会在报价时就把改动次数写进合同","最根本的解法：不依赖单一甲方，自己掌握客源"],
+    traits:[
+      {name:"抠门指数",val:95,desc:"「能不能便宜点」是口头禅，免费的最好"},
+      {name:"需求变化",val:78,desc:"每次都说「最后改一点」，你已经数不清第几次了"},
+      {name:"画饼能力",val:40,desc:"倒是不怎么画饼，因为连饼都舍不得画"},
+      {name:"拖款指数",val:92,desc:"「下个月一起结」已经说了三个月了"}
+    ],
+    hookTitle:"别气了，全国 41% 的乙方都遇到了同款",
+    hookText:"伺候甲方这么累，是因为主动权不在你手上。<br>与其等甲方赏饭，不如<strong>自己学会找客户</strong>。<br><strong>从伺候甲方，到自己当甲方。</strong>"
+  },
+  zhanan: { name:"渣男型甲方", code:"BIG PIE", emoji:"🌹", pct:27, stars:"★★★★☆",
+    tagline:"嘴上说的都好听，就是不落实",
+    summary:"这是杀伤力最大的甲方类型。他不会直接为难你，反而对你很「好」——夸你专业、说后面还有大单、承诺不会亏待你。但每一句好话背后都藏着一个坑。你不知不觉投入越来越多，回报却从来没兑现过。",
+    pros:["沟通体验还行，至少态度好","不会当面撕破脸，给你留面子","偶尔真的会有一些小单给你"],
+    cons:["承诺从来不兑现，「下次一定」永远没有下次","让你一直抱有希望，一直投入沉没成本","验收时突然翻脸，所有问题都是你的"],
+    pitfalls:["别被「后面还有大单」忽悠了——先把这单的钱结了再说","「你是专业的你来定」不是信任你，是在给你挖坑","最根本的解法：客户不能只靠一个甲方介绍，得自己有渠道"],
+    traits:[
+      {name:"抠门指数",val:55,desc:"不算抠，但「不会亏待你」从来没兑现过"},
+      {name:"需求变化",val:60,desc:"需求不常改，但验收时突然翻脸比翻书还快"},
+      {name:"画饼能力",val:98,desc:"全类型最强，每次都让你觉得下一单更大"},
+      {name:"拖款指数",val:70,desc:"不直接拖，但总有理由延期，温水煮青蛙"}
+    ],
+    hookTitle:"渣男型甲方最大的杀伤力",
+    hookText:"让你一直抱有希望，一直投入，但永远得不到对等的回报。<br>做生意也一样——<strong>与其依赖不靠谱的甲方，不如自己掌握客源。</strong>"
+  },
+  wanmei: { name:"完美型甲方", code:"AGAIN", emoji:"🔍", pct:19, stars:"★★★★☆",
+    tagline:"永远差一点，但说不出差在哪",
+    summary:"这种甲方不坏，但极度消耗。他自己也不知道要什么，但知道你做的「不太对」。你改了八版他还是觉得「差点感觉」，但你问他差哪里他又说不上来。你的时间和耐心就这样被无限稀释。",
+    pros:["至少不是故意为难你，确实是选择困难","对质量有追求，做出来的东西不会太差","钱倒是给——只是验收遥遥无期"],
+    cons:["无限修改消耗你大量时间和精力","他的「差点感觉」你永远猜不透","做到最后你比他还不知道要什么了"],
+    pitfalls:["别以为改到最后他会满意——不会的，学会在第三版时锁定方向","合同里写清楚修改次数和额外收费标准","最根本的解法：与其耗在一个项目上，不如自己找更多客户分散风险"],
+    traits:[
+      {name:"抠门指数",val:45,desc:"钱倒是给，但你的时间被无限消耗也是一种剥削"},
+      {name:"需求变化",val:97,desc:"全类型最强——改到第 8 版你已经忘了第 1 版什么样"},
+      {name:"画饼能力",val:65,desc:"「做好这个后面还有大单」——你信吗？"},
+      {name:"拖款指数",val:35,desc:"付款倒是还行，就是验收遥遥无期"}
+    ],
+    hookTitle:"完美型甲方消耗的不是你的能力",
+    hookText:"是你的耐心和时间。你的精力全耗在无尽的修改里了。<br>如果客户是自己找来的，<strong>你就是甲方，你说了算。</strong>"
+  },
+  shuaishou: { name:"甩手型甲方", code:"NOT ME", emoji:"🫥", pct:13, stars:"★★★★★",
+    tagline:"啥都不管，出事全找你",
+    summary:"这是最危险的甲方类型。平时你完全找不到他，需要确认的事已读不回，需要拍板的事「你看着办」。但一旦出了问题，他瞬间上线，而且所有责任都是你的——因为「是你决定的」。你不是他的乙方，你是他的背锅侠。",
+    pros:["自由度高——反正他也不管","不用应付频繁的沟通和汇报","如果一切顺利，他会觉得你很能干"],
+    cons:["没有明确需求，你只能靠猜","出了问题全是你的锅，没有人帮你扛","拖款是标配，因为他连审批都懒得发起"],
+    pitfalls:["每次沟通都留文字记录，关键决策让他书面确认","「你看着办」不是信任，是在给自己留后路","最根本的解法：不要把全部精力押在一个甩手甲方身上，自己建立客户渠道"],
+    traits:[
+      {name:"抠门指数",val:85,desc:"花最少的钱想要最好的效果，且理所当然"},
+      {name:"需求变化",val:30,desc:"需求不变——因为他根本没给过明确需求"},
+      {name:"画饼能力",val:50,desc:"不画饼也不给方向，你全靠猜"},
+      {name:"拖款指数",val:90,desc:"催三遍已读不回，第四遍说「在走流程」"}
+    ],
+    hookTitle:"甩手型甲方是最危险的一种",
+    hookText:"因为你永远不知道他什么时候炸。<br>做生意最怕的不是忙，是<strong>被动</strong>。<br><strong>自己掌握客源，才能选择和谁合作。</strong>"
+  }
+};
+
+const allTypes = ['pixiu','zhanan','wanmei','shuaishou'];
+let selected = [null,null,null,null];
+
+// render questions
+const qWrap = document.getElementById('questions');
+Qs.forEach((q,qi) => {
+  const block = document.createElement('div');
+  block.className = 'q-block';
+  block.innerHTML = `<div class="q-label"><span class="q-num">Q${qi+1}</span>${q.q}</div>
+    <div class="q-opts" data-qi="${qi}">${q.opts.map((o,oi) =>
+      `<div class="q-opt" data-qi="${qi}" data-oi="${oi}">${o.text}</div>`
+    ).join('')}</div>`;
+  qWrap.appendChild(block);
+});
+
+// option click
+document.querySelectorAll('.q-opt').forEach(opt => {
+  function pick(e) {
+    e.preventDefault();
+    const qi = +opt.dataset.qi, oi = +opt.dataset.oi;
+    if (selected[qi] === oi) return;
+    const wrap = opt.closest('.q-opts');
+    wrap.querySelectorAll('.q-opt').forEach(o => o.classList.remove('selected'));
+    opt.classList.add('selected');
+    selected[qi] = oi;
+    checkReady();
+  }
+  opt.addEventListener('click', pick);
+  opt.addEventListener('touchend', e => { e.preventDefault(); pick(e); });
+});
+
+function checkReady() {
+  const ready = selected.every(s => s !== null);
+  document.getElementById('submitBtn').classList.toggle('active', ready);
+}
+
+// submit
+document.getElementById('submitBtn').addEventListener('click', function() {
+  if (!this.classList.contains('active')) return;
+  const scores = {pixiu:0,zhanan:0,wanmei:0,shuaishou:0};
+  selected.forEach((oi, qi) => {
+    const s = Qs[qi].opts[oi].s;
+    for (const k in s) scores[k] += s[k];
+  });
+  const winner = Object.keys(scores).sort((a,b) => scores[b]-scores[a])[0];
+  showResult(winner);
+});
+
+function showResult(typeKey) {
+  document.getElementById('mainPage').style.display = 'none';
+  const res = document.getElementById('result');
+  const t = TYPES[typeKey];
+  res.style.display = 'block';
+
+  const traitRows = t.traits.map(tr =>
+    `<div class="trait">
+      <div class="trait-top"><span class="trait-name">${tr.name}</span><span class="trait-val">${tr.val}%</span></div>
+      <div class="trait-bar"><div class="trait-fill" style="width:0%" data-w="${tr.val}"></div></div>
+      <div class="trait-desc">${tr.desc}</div>
+    </div>`
+  ).join('');
+
+  res.innerHTML = `
+    <div class="res-header">
+      <div class="res-emoji">${t.emoji}</div>
+      <div class="res-code">${t.code}</div>
+      <div class="res-type">${t.name}</div>
+      <div class="res-tagline">"${t.tagline}"</div>
+      <div class="res-stats">
+        <div><div class="res-stat-val">${t.pct}%</div><div class="res-stat-label">遇到同款甲方</div></div>
+        <div><div class="res-stat-val">${t.stars}</div><div class="res-stat-label">离谱指数</div></div>
+      </div>
+    </div>
+    <div class="res-summary">
+      <div class="res-summary-title">📝 综合分析</div>
+      <div class="res-summary-text">${t.summary}</div>
+    </div>
+    <div class="res-traits">
+      <div class="res-traits-title">📊 甲方画像</div>
+      ${traitRows}
+    </div>
+    <div class="res-hook">
+      <div class="res-hook-title">💡 ${t.hookTitle}</div>
+      <div class="res-hook-text">${t.hookText}</div>
+    </div>
+    <div class="res-cta">
+      <div class="res-cta-badge">🏢 官方中小商家扶持活动 · 限时免费</div>
+      <div class="res-cta-title">不伺候甲方了，自己找客户</div>
+      <div class="res-cta-sub">免费领取一份专属获客方案</div>
+      <div class="res-cta-list">
+        <div class="res-cta-item">你所在行业的同行获客案例</div>
+        <div class="res-cta-item">2026 行业获客趋势与打法</div>
+        <div class="res-cta-item">从 0 开始的获客路径规划</div>
+        <div class="res-cta-item">一对一顾问免费答疑</div>
+      </div>
+      <div class="res-cta-qr">二维码</div>
+      <div class="res-cta-trust">✅ 全程免费 · ✅ 不推销 · ✅ 随时可删</div>
+    </div>
+    <div class="res-share"><span class="res-share-btn">😤 让朋友也来鉴定他的甲方</span></div>
+    <div class="res-foot">已有 9,632 人吐槽过</div>
+  `;
+
+  window.scrollTo({top:0,behavior:'smooth'});
+  setTimeout(() => {
+    res.querySelectorAll('[data-w]').forEach(bar => { bar.style.width = bar.dataset.w + '%'; });
+  }, 200);
+}
+</script>
+</body>
+</html>
